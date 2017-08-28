@@ -1,0 +1,212 @@
+package theofficeoutlet.com.theofficeoutlet.Utilities;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Environment;
+import android.text.InputFilter;
+import android.text.Spanned;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.PopupWindow;
+import android.widget.Toast;
+
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import theofficeoutlet.com.theofficeoutlet.Activities.LoginActivity;
+import theofficeoutlet.com.theofficeoutlet.R;
+
+public class Utility {
+
+    public static String BASE_URL = "http://vendor.theofficeoutlet.com/jconnect/vendor/";
+
+    public static final int SUCCESS = 1;
+    public static final int FAIL = 0;
+    public static final String PREF_NAME = "PREF_NAME";
+    public static final String USER_TOKEN = "USER_TOKEN";
+    public static final String DEVICE_ID = "DEVICE_ID";
+    public static final String IS_USER_LOGIN = "IS_USER_LOGIN";
+    private static final String ALLOWED_URI_CHARS = "@#&=*+-_.,:!?()/~'%";
+    private static Dialog progressDialog;
+    private static SharedPreferences settings;
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static void showToast(Context context, String message) {
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, getPixelsFromDp(context, 70));
+        toast.show();
+    }
+
+    public static int getPixelsFromDp(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
+
+    public static void hideProgress() {
+        try {
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void showProgress(Context context){
+        progressDialog = new Dialog(context, R.style.Theme_Dialog);
+        progressDialog.setContentView(R.layout.popup_loading);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    public static String getAppStoragePath(Context context, String dir) {
+        String path;
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            path = Environment.getExternalStorageDirectory() + "/" + context.getString(R.string.app_name);
+        } else {
+            path = context.getFilesDir() + "/" + context.getString(R.string.app_name);
+        }
+        String directory = +dir.trim().length() > 0 ? (dir) : "";
+        File file = new File(path + directory);
+        if (!file.exists())
+            file.mkdirs();
+
+        return file.getAbsolutePath();
+    }
+
+    public static String encodeImageURLForSpecialCharacter(String url) {
+        return Uri.encode(url, ALLOWED_URI_CHARS);
+    }
+
+    public static String getDateCurrentTimeZone(long timestamp) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(timestamp * 1000);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm a");
+            Date currenTimeZone = (Date) calendar.getTime();
+            return sdf.format(currenTimeZone);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static boolean isValidEmailAddress(String emailAddress) {
+        String emailRegEx;
+        Pattern pattern;
+        emailRegEx = "^[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,4}$";
+        pattern = Pattern.compile(emailRegEx);
+        Matcher matcher = pattern.matcher(emailAddress);
+        if (!matcher.find()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static void showMessageDialog(Context context,String message){
+        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        alertDialog.setTitle("              Error Message");
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
+    public static byte[] getImageBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    public static Bitmap getImage(byte[] image) {
+        return BitmapFactory.decodeByteArray(image, 0, image.length);
+    }
+
+    public static byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+
+   private static float parseFloat(String str) {
+        try {
+            return Float.parseFloat(str);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static void setSharePreBoolean(Context context,String key,boolean value){
+        SharedPreferences.Editor editor;
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        editor = settings.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public static boolean getSharePreBoolean(Context context,String key){
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return settings.getBoolean(key,false);
+    }
+
+    public static void removeSharePre(Context context){
+        SharedPreferences.Editor editor;
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        editor = settings.edit();
+        editor.remove(PREF_NAME).commit();
+    }
+
+    public static void setSharePreString(Context context,String key,String value){
+        SharedPreferences.Editor editor;
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        editor = settings.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    public static String getSharePreString(Context context,String key){
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return settings.getString(key,"");
+    }
+
+    public static boolean isKeyExist(Context context,String key){
+        return context.getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE).contains(key);
+    }
+}
