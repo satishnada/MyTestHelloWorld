@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/lnrSignUp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:layout_margin="@dimen/_5sdp"
+                android:orientation="vertical">
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtFirstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="First Name "
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtFirstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:gravity="top"
+                    android:hint="First Name"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black_dark"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtLastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Last Name "
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtLastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:gravity="top"
+                    android:hint="Last Name"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black_dark"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtPhoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Phone Number"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtPhoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:gravity="top"
+                    android:hint="Phone Number"
+                    android:imeOptions="actionNext"
+                    android:inputType="phone"
+                    android:singleLine="true"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black_dark"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtEmail_Address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Email Address"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtEmailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:gravity="top"
+                    android:hint="Email Address"
+                    android:imeOptions="actionNext"
+                    android:inputType="textEmailAddress"
+                    android:singleLine="true"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black_dark"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtDateOfBirth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:text="Date of Birth"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomTextView
+                    android:id="@+id/txtDateofbirth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:visibility="gone"
+                    android:gravity="top"
+                    android:hint="Date of birth"
+                    android:imeOptions="actionNext"
+                    android:inputType="date"
+                    android:singleLine="true"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black_dark"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Password"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:padding="@dimen/_10sdp"
+                    android:singleLine="true"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:hint="Password"
+                    android:textColorHint="@color/black_dark"
+                    android:inputType="textPassword"
+                    android:imeOptions="actionNext"
+                    android:textSize="@dimen/_16sdp"
+                    android:textColor="@color/black"/>
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Confirm Password"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:padding="@dimen/_10sdp"
+                    android:singleLine="true"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:hint="Confirm Password"
+                    android:textColorHint="@color/black_dark"
+                    android:inputType="textPassword"
+                    android:imeOptions="actionDone"
+                    android:textSize="@dimen/_16sdp"
+                    android:textColor="@color/black"/>
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtGender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Gender"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/btnRadioMale"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/_5sdp"
+                        android:text="Male"/>
+
+                    <RadioButton
+                        android:id="@+id/btnRadioFemale"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Female"/>
+
+                </RadioGroup>
+
+                <com.sciencecity.ahm.CustomView.CustomButton
+                    android:id="@+id/btnSignUp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_60sdp"
+                    android:layout_gravity="center"
+                    android:gravity="center_horizontal|center"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:textSize="@dimen/_16sdp"
+                    android:textColor="@color/white"
+                    android:textAllCaps="true"
+                    android:text="Sign Up"
+                    android:background="@drawable/rounded_button_log_out"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lnrOtp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_10sdp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <WebView
+                    android:id="@+id/webViewOtp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                </WebView>
+
+                <com.sciencecity.ahm.CustomView.CustomTextViewBold
+                    android:id="@+id/txtOtp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="ENTER YOUR OTP"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomEdiText
+                    android:id="@+id/edtOtp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/_20sdp"
+                    android:background="@drawable/rounded_edit_text_bg"
+                    android:gravity="top"
+                    android:hint="Enter your OTP"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black_dark"
+                    android:textSize="@dimen/_16sdp" />
+
+                <com.sciencecity.ahm.CustomView.CustomButton
+                    android:id="@+id/btnOtpResend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_gravity="left"
+                    android:gravity="center_horizontal|center"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:textSize="@dimen/_16sdp"
+                    android:textColor="@color/white"
+                    android:textAllCaps="true"
+                    android:text="RESEND"
+                    android:background="@drawable/rounded_corner_item_bg"/>
+
+                <com.sciencecity.ahm.CustomView.CustomButton
+                    android:id="@+id/btnOtp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_60sdp"
+                    android:layout_gravity="center"
+                    android:gravity="center_horizontal|center"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:textSize="@dimen/_16sdp"
+                    android:textColor="@color/white"
+                    android:textAllCaps="true"
+                    android:text="Submit"
+                    android:background="@drawable/rounded_button_log_out"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
