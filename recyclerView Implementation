@@ -1,0 +1,120 @@
+public class MyTicketActivity extends BaseActivity {
+
+
+    private View mView;
+    private RecyclerView recyclerTicketList;
+    private YourTicketListAdapter ticketListAdapter;
+    private TextView txtNoDataFound;
+    private ArrayList<YourTicketRequestResponse.YourTicke> ticketList = new ArrayList<YourTicketRequestResponse.YourTicke>();
+
+    @Override
+    public void setLayoutView() {
+        mView = LayoutInflater.from(this).inflate(R.layout.activity_your_ticket, lnrContainer);
+
+        recyclerTicketList = (RecyclerView) mView.findViewById(R.id.recyclerYourTicketsList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerTicketList.setLayoutManager(linearLayoutManager);
+        recyclerTicketList.setHasFixedSize(true);
+        txtNoDataFound = (TextView) mView.findViewById(R.id.txtNoDataFound);
+
+       getTicketList();
+
+    }
+
+    @Override
+    public void initialization() {
+        txtActivityTitle.setText("My Ticket");
+    }
+
+    public void itemClick(int position){
+       /* Intent intent = new Intent(MyTicketActivity.this,EventsDetailActivity.class);
+        startActivity(intent,null);
+        finish();*/
+
+    }
+
+    @Override
+    public void setupData() {
+
+    }
+
+    public void getTicketList(){
+        try {
+            if (Utility.isNetworkAvailable(MyTicketActivity.this)) {
+                Utility.showProgress(MyTicketActivity.this);
+
+                WebServicesRequest.ConsumerApiInterface service = WebServicesRequest.getClient();
+
+                Map jasonData = new HashMap();
+                jasonData.put("user_id",Utility.getSharePreString(MyTicketActivity.this,"LOGIN_ID"));
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(jasonData)).toString());
+
+                Call<YourTicketRequestResponse> call = service.getTicketList(body);
+
+                call.enqueue(new Callback<YourTicketRequestResponse>() {
+                    @Override
+                    public void onResponse(Call<YourTicketRequestResponse> call, Response<YourTicketRequestResponse> response) {
+                        Utility.hideProgress();
+
+                        if (response.isSuccessful()){
+                            final YourTicketRequestResponse result = response.body();
+
+                            ticketList = result.getMy_tickets();
+                            ticketListAdapter = new YourTicketListAdapter(MyTicketActivity.this,ticketList);
+                            recyclerTicketList.setAdapter(ticketListAdapter);
+
+                            if (ticketList != null){
+                                if (ticketList.isEmpty()){
+                                    recyclerTicketList.setVisibility(View.GONE);
+                                    txtNoDataFound.setVisibility(View.VISIBLE);
+                                }else{
+                                    recyclerTicketList.setVisibility(View.VISIBLE);
+                                    txtNoDataFound.setVisibility(View.GONE);
+                                }
+                            }else{
+                                recyclerTicketList.setVisibility(View.GONE);
+                                txtNoDataFound.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<YourTicketRequestResponse> call, Throwable t) {
+                        t.printStackTrace();
+                        Utility.hideProgress();
+                        Utility.showToast(MyTicketActivity.this,getString(R.string.check_internet));
+                    }
+                });
+
+            } else {
+                Utility.hideProgress();
+                Utility.showToast(MyTicketActivity.this, "Error");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setListeners() {
+        imgTopFirst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imgTopFirst.setSelected(!imgTopFirst.isSelected());
+                if (imgTopFirst.isSelected()){
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }else{
+                    drawerLayout.closeDrawers();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(MyTicketActivity.this,HomeActivity.class),null);
+        overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+        finish();
+    }
+}
