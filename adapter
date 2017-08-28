@@ -1,0 +1,154 @@
+public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.ViewHolder> {
+
+    private Context mContext;
+    private ArrayList<EventsRequestResponse.EventRequest> mActivityListData;
+    private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+    private DisplayImageOptions options;
+
+    public EventsListAdapter(Context context, ArrayList<EventsRequestResponse.EventRequest> activityList) {
+        mContext = context;
+        mActivityListData = activityList;
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.sciencecity)
+                .showImageForEmptyUri(R.drawable.sciencecity)
+                .showImageOnFail(R.drawable.sciencecity)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .displayer(new RoundedBitmapDisplayer(20))
+                .build();
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_events_list, viewGroup, false);
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(final EventsListAdapter.ViewHolder holder, final int position) {
+        try {
+            holder.getCardItemIcon().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((EventsActivity)mContext).itemClick(position);
+                }
+            });
+
+            Log.i("EventDetail",""+mActivityListData.get(position).getStart_date());
+            try {
+                SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                Date todayDate = sFormat.parse(mActivityListData.get(position).getStart_date());
+
+                SimpleDateFormat sFormat1 = new SimpleDateFormat("dd-MM-yyyy");
+
+                Log.i("EventDetail dfdf ",""+sFormat1.format(todayDate));
+                holder.getTxtStartDate().setText(sFormat1.format(todayDate));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            holder.getTxtItemName().setText(mActivityListData.get(position).getSeminar_name());
+
+            ImageLoader.getInstance().displayImage(mActivityListData.get(position).getImage(),holder.getImgItemIcon(),options,new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+                    holder.getProgressbar().setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                    holder.getProgressbar().setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    holder.getProgressbar().setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onLoadingCancelled(String imageUri, View view) {
+                    holder.getProgressbar().setVisibility(View.GONE);
+                }
+            });
+
+            holder.getBtnDetail().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((EventsActivity)mContext).itemClick(position);
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mActivityListData.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final CardView cardItemIcon;
+        private final ImageView imgItemIcon;
+        private final TextView txtItemName;
+        private final TextView txtStartDate;
+        private final Button btnDetail;
+        private ProgressBar progressbar;
+
+        public ViewHolder(View view) {
+            super(view);
+
+            txtItemName = (TextView) view.findViewById(R.id.txtItemName);
+            txtStartDate = (TextView) view.findViewById(R.id.txtStartDate);
+            cardItemIcon = (CardView) view.findViewById(R.id.cardItemIcon);
+            imgItemIcon = (ImageView) view.findViewById(R.id.imgItemIcon);
+            btnDetail = (Button) view.findViewById(R.id.btnDetail);
+            progressbar = (ProgressBar) view.findViewById(R.id.progressbar);
+        }
+
+        public Button getBtnDetail() {
+            return btnDetail;
+        }
+
+        public TextView getTxtItemName() {
+            return txtItemName;
+        }
+
+        public CardView getCardItemIcon() {
+            return cardItemIcon;
+        }
+
+        public ImageView getImgItemIcon() {
+            return imgItemIcon;
+        }
+
+        public ProgressBar getProgressbar() {
+            return progressbar;
+        }
+
+        public TextView getTxtStartDate() {
+            return txtStartDate;
+        }
+    }
+
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 700);
+                    displayedImages.add(imageUri);
+                }
+            }
+        }
+    }
