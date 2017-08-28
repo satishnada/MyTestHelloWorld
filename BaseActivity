@@ -1,0 +1,159 @@
+public abstract class BaseActivity extends Activity {
+
+    private String TAG = BaseActivity.class.getSimpleName();
+
+    public LinearLayout lnrContainer;
+    private RelativeLayout lnrTopBar;
+    public ImageView imgTopFirst;
+    public ImageView imgTopFour;
+    public ImageView imgTopFive;
+    public TextView txtActivityTitle;
+
+    public DrawerLayout drawerLayout;
+    public FrameLayout flHeaderView;
+    public RecyclerView recyclerView;
+    public String navTitles[];
+    public TypedArray navIcons;
+    public RecyclerView.Adapter recyclerViewAdapter;
+
+/*    "email_id" : "ravi6628@gmail.com",
+            "password" : "ravi211289",*/
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_base);
+
+        lnrTopBar = (RelativeLayout) findViewById(R.id.lnrTopBar);
+        imgTopFirst = (ImageView) findViewById(R.id.imgTopBarFirst);
+        txtActivityTitle = (TextView) findViewById(R.id.txtActivityTitle);
+        imgTopFour = (ImageView) findViewById(R.id.imgTopBarFour);
+        imgTopFive = (ImageView) findViewById(R.id.imgTopBarFive);
+        lnrContainer = (LinearLayout) findViewById(R.id.lnrContainer);
+
+        recyclerView  = (RecyclerView) findViewById(R.id.recyclerView);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerMainActivity);
+        flHeaderView = (FrameLayout) findViewById(R.id.flHeaderView);
+        navTitles = getResources().getStringArray(R.array.navDrawerItems);
+        navIcons = getResources().obtainTypedArray(R.array.navDrawerIcons);
+
+        recyclerViewAdapter = new RecyclerViewAdapter(navTitles,navIcons,this);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(getResources().getColor(R.color.drawer_item_bg));
+            getWindow().setEnterTransition(new Fade());
+            getWindow().setExitTransition(new Explode());
+        }
+
+        flHeaderView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.closeDrawers();
+            }
+        });
+
+        setLayoutView();
+        initialization();
+        setupData();
+        setListeners();
+
+        setCrashLogHandler();
+    }
+
+    public void hideTopBar(){
+        lnrTopBar.setVisibility(View.GONE);
+    }
+
+    public void showTopBar(){
+        lnrTopBar.setVisibility(View.VISIBLE);
+    }
+
+    public void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void showKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInputFromWindow(view.getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    public void onDrawerMenuClick(int position){
+
+        drawerLayout.closeDrawers();
+
+        switch (position){
+            case 0:
+                startActivity(new Intent(BaseActivity.this,HomeActivity.class));
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                finish();
+                break;
+            case 1:
+                startActivity(new Intent(BaseActivity.this,MoviesActivity.class));
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                finish();
+                break;
+            case 2:
+                startActivity(new Intent(BaseActivity.this,EventsActivity.class));
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                finish();
+                break;
+            case 3:
+                if (Utility.getSharePreString(BaseActivity.this,"LOGIN").equalsIgnoreCase("LOGIN")){
+                    Intent intent1 = new Intent(BaseActivity.this,MyTicketActivity.class);
+                    startActivity(intent1);
+                    overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                    finish();
+                }else{
+                    Intent intent  = new Intent(BaseActivity.this,LoginActivity.class);
+                    intent.putExtra("FROM","BASE");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                    finish();
+                }
+
+                break;
+            case 4:
+                if (Utility.getSharePreString(BaseActivity.this,"LOGIN").equalsIgnoreCase("LOGIN")){
+                    Intent intent = new Intent(BaseActivity.this,SettingActivity.class);
+                    intent.putExtra("IS_SETTING",true);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                    finish();
+                }else{
+                    Intent intent  = new Intent(BaseActivity.this,LoginActivity.class);
+                    intent.putExtra("FROM","BASE");
+                    startActivity(intent);
+                    finish();
+                }
+                break;
+        }
+    }
+
+    public abstract void setLayoutView();
+
+    public abstract void initialization();
+
+    public abstract void setupData();
+
+    public abstract void setListeners();
+
+    public void setCrashLogHandler() {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                CrashReportHandler.attach(getApplicationContext());
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+}
