@@ -1,0 +1,59 @@
+public class SplashActivity extends Activity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(getResources().getColor(R.color.drawer_item_bg));
+        }
+
+        if (checkPlayServices()) {
+            new Handler().postDelayed(new Runnable() {
+                public void run() {
+                    registerInBackground();
+                }
+            }, 800);
+        } else {
+//            if (dbHelper.getUser() == null){
+//                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+//            }else{
+//                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+//            }
+            startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+            overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+            finish();
+        }
+
+    }
+
+    private boolean checkPlayServices() {
+        return true;
+    }
+
+    private void registerInBackground() {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                return msg;
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                super.onPostExecute(msg);
+               /* if (dbHelper.getUser() == null){
+                    startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                }else{
+                    startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+                }*/
+                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                finish();
+            }
+        }.execute();
+    }
+
+}
