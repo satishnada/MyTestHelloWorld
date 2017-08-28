@@ -1,0 +1,88 @@
+public class Utility {
+
+    public static String BASE_URL = "https://scity.gujarat.gov.in/";
+    //public static String BASE_URL = "http://imagewebsolution.com/web/science-city/demo/";
+    public static final String SUCCESS = "1";
+    public static final String FAIL = "0";
+    public static final String PREF_NAME = "PREF_NAME";
+    public static final String ADDRESS = "ADDRESS";
+    public static final String POST_CODE = "POST_CODE";
+    public static final String PHONE_NUMBER = "PHONE_NUMBER";
+    public static final String EMAIL_ADDRESS = "EMAIL_ADDRESS";
+    public static final String PRODUCT_TYPE_PREF_NAME = "PRODUCT_TYPE_PREF_NAME";
+    public static final String PRODUCT_PRIORITY_PREF_NAME = "PRODUCT_PRIORITY_PREF_NAME";
+    public static final String PRODUCT_TICKET_TYPE_PREF_NAME = "PRODUCT_TICKET_PREF_NAME";
+    private static Dialog progressDialog;
+    static SharedPreferences settings;
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static void showToast(Context context, String message) {
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, getPixelsFromDp(context, 70));
+        toast.show();
+    }
+
+    public static int getPixelsFromDp(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
+
+    public static void hideProgress() {
+        try {
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void showProgress(Context context){
+        progressDialog = new Dialog(context,R.style.Theme_Dialog);
+        progressDialog.setContentView(R.layout.popup_loading);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    public static String getAppStoragePath(Context context, String dir) {
+        String path;
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            path = Environment.getExternalStorageDirectory() + "/" + context.getString(R.string.app_name);
+        } else {
+            path = context.getFilesDir() + "/" + context.getString(R.string.app_name);
+        }
+        String directory = +dir.trim().length() > 0 ? (dir) : "";
+        File file = new File(path + directory);
+        if (!file.exists())
+            file.mkdirs();
+
+        return file.getAbsolutePath();
+    }
+
+    public static void setSharePreString(Context context,String key,String value){
+        SharedPreferences.Editor editor;
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        editor = settings.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
+
+    public static void removeSharePre(Context context){
+        SharedPreferences.Editor editor;
+        settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        editor = settings.edit();
+        editor.clear().apply();
+    }
+
+    public static String getSharePreString(Context context,String key){
+        SharedPreferences settings = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        String value = settings.getString(key, "");
+        return value;
+    }
+}
