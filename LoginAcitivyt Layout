@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:layout_weight="2"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/_30sdp"
+            android:layout_marginRight="@dimen/_30sdp"
+            android:layout_height="@dimen/_150sdp"
+            android:scaleType="fitCenter"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:src="@drawable/splash_screen_icon"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lnrLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/_20sdp"
+        android:layout_marginRight="@dimen/_20sdp"
+        android:gravity="top"
+        android:layout_weight="1"
+        android:layout_gravity="top"
+        android:orientation="vertical">
+
+        <com.sciencecity.ahm.CustomView.CustomEdiText
+            android:id="@+id/edtUserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:padding="@dimen/_5sdp"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/mail"
+            android:drawablePadding="@dimen/_10sdp"
+            android:background="@drawable/rounded_edit_text_bg"
+            android:hint="Email ID"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:textSize="@dimen/_16sdp"
+            android:textColorHint="@color/black_dark"
+            android:textColor="@color/black"/>
+
+        <com.sciencecity.ahm.CustomView.CustomEdiText
+            android:id="@+id/edtUserPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/password_image"
+            android:drawablePadding="@dimen/_5sdp"
+            android:background="@drawable/rounded_edit_text_bg"
+            android:hint="Password"
+            android:textColorHint="@color/black_dark"
+            android:inputType="textPassword"
+            android:imeOptions="actionDone"
+            android:textSize="@dimen/_16sdp"
+            android:textColor="@color/black"/>
+
+        <com.sciencecity.ahm.CustomView.CustomTextViewBold
+            android:id="@+id/txtForgetPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_below="@+id/txtSignUp"
+            android:gravity="center"
+            android:text="Forget Password"
+            android:textAllCaps="true"
+            android:textColor="@color/appColor"
+            android:textSize="@dimen/_16sdp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/_10sdp">
+
+            <com.sciencecity.ahm.CustomView.CustomButton
+                android:id="@+id/btnSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/_10sdp"
+                android:paddingTop="@dimen/_10sdp"
+                android:layout_gravity="center"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center_horizontal|center"
+                android:textSize="@dimen/_16sdp"
+                android:textColor="@color/white"
+                android:textAllCaps="true"
+                android:text="Login"
+                android:background="@drawable/rounded_button_log_out"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <com.sciencecity.ahm.CustomView.CustomTextViewBold
+        android:id="@+id/txtSignUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_below="@+id/btnSignIn"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:padding="@dimen/_5sdp"
+        android:visibility="visible"
+        android:text="Don't have an account? SignUp"
+        android:textAllCaps="true"
+        android:textColor="@color/appColor"
+        android:textSize="@dimen/_16sdp" />
+
+</LinearLayout>
