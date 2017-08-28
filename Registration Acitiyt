@@ -1,0 +1,332 @@
+public class RegistrationActivity extends BaseActivity {
+
+    private View mView;
+    private EditText edtFirstName;
+    private EditText edtLastName;
+    private EditText edtPhoneNumber;
+    private EditText edtEmailAddress;
+    private EditText edtPassword;
+    private EditText edtConfirmPassword;
+
+    private LinearLayout lnrOtp;
+    private LinearLayout lnrSignUp;
+    private EditText edtOtp;
+    private Button btnOtp;
+    private Button btnSignUp;
+    private WebView webViewOtp;
+    private String otpRandom;
+    private String gender = "male";
+    private String dateOfBirth = "3-2-1991";
+    private EditText edtDateofbirth;
+    private TextView txtDateofbirth;
+    private boolean isFromOtp = false;
+    private Button btnOtpResend;
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+    private RadioButton btnRadioMale;
+    private RadioButton btnRadioFemale;
+    private boolean isEmailVerify = false;
+
+    @Override
+    public void setLayoutView() {
+        mView = LayoutInflater.from(this).inflate(R.layout.activity_registration, lnrContainer);
+
+        edtFirstName = (EditText) mView.findViewById(R.id.edtFirstName);
+        edtLastName = (EditText) mView.findViewById(R.id.edtLastName);
+        edtPhoneNumber = (EditText) mView.findViewById(R.id.edtPhoneNumber);
+        edtEmailAddress = (EditText) mView.findViewById(R.id.edtEmailAddress);
+        edtPassword = (EditText) mView.findViewById(R.id.edtPassword);
+        edtConfirmPassword = (EditText) mView.findViewById(R.id.edtConfirmPassword);
+        btnSignUp = (Button) mView.findViewById(R.id.btnSignUp);
+        btnOtp = (Button) mView.findViewById(R.id.btnOtp);
+        edtOtp = (EditText) mView.findViewById(R.id.edtOtp);
+        lnrOtp = (LinearLayout) mView.findViewById(R.id.lnrOtp);
+        lnrSignUp = (LinearLayout) mView.findViewById(R.id.lnrSignUp);
+        webViewOtp = (WebView) mView.findViewById(R.id.webViewOtp);
+        txtDateofbirth = (TextView) mView.findViewById(R.id.txtDateofbirth);
+        btnOtpResend = (Button) mView.findViewById(R.id.btnOtpResend);
+        btnRadioMale = (RadioButton) mView.findViewById(R.id.btnRadioMale);
+        btnRadioFemale = (RadioButton) mView.findViewById(R.id.btnRadioFemale);
+
+        btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (edtFirstName.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter first name");
+                }else if (edtLastName.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter last name");
+                }else if (edtPhoneNumber.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter phone number");
+                }else if (!(edtPhoneNumber.getText().toString().trim().length() > 9)){
+                    Utility.showToast(RegistrationActivity.this,"Please enter valid phone number");
+                }else if (edtEmailAddress.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter email id");
+                }else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(edtEmailAddress.getText()).matches()){
+                    Utility.showToast(RegistrationActivity.this,"Please enter valid email id");
+                }/*else if (txtDateofbirth.getText().toString().trim().length() == 0) {
+                    Utility.showToast(RegistrationActivity.this, "Please enter date of birth");
+                }*/else if (edtPassword.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter password");
+                }else if (edtConfirmPassword.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter confirm password");
+                }else if (!edtPassword.getText().toString().trim().equalsIgnoreCase(edtConfirmPassword.getText().toString().trim())){
+                    Utility.showToast(RegistrationActivity.this,"Please enter valid confirm password");
+                }else{
+                    //Utility.showProgress(RegistrationActivity.this);
+                    //Utility.setSharePreString(RegistrationActivity.this,"EMAIL_ID",edtEmailAddress.getText().toString().trim());
+                   // checkEmail();
+                    otpRandom = String.valueOf(Math.random()).substring(3,8);
+                    lnrOtp.setVisibility(View.VISIBLE);
+                    lnrSignUp.setVisibility(View.GONE);
+                    //webViewOtp.clearCache(true);
+                    isFromOtp = true;
+                    btnOtpResend.performClick();
+                    String url = "http://ip.shreesms.net/smsserver/SMS10N.aspx?Userid=SCCITY&UserPassword=SCCITY&PhoneNumber"+edtPhoneNumber.getText()+"&Text=Your one time password at Science City is : "+otpRandom+"";
+                    webViewOtp.loadUrl(url);
+                    //String url = "http://ip.shreesms.net/smsserver/SMS10N.aspx?Userid=SCCITY&UserPassword=SCCITY&PhoneNumber"+edtPhoneNumber.getText()+"&Text=Your one time password at Science City is : "+otpRandom+"";
+                    //webViewOtp.loadUrl(url);
+                    //Utility.hideProgress();
+                }
+            }
+        });
+
+        btnOtp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (edtFirstName.getText().toString().trim().length() == 0){
+                    Utility.showToast(RegistrationActivity.this,"Please enter first name");
+                }else if (!edtOtp.getText().toString().trim().equalsIgnoreCase(otpRandom)){
+                    Utility.showToast(RegistrationActivity.this,"Please enter correct it's does not match try again");
+                }else{
+                    userRegistration();
+                }
+            }
+        });
+
+        btnOtpResend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                otpRandom = String.valueOf(Math.random()).substring(3,8);
+                String url = "http://ip.shreesms.net/smsserver/SMS10N.aspx?Userid=AARKin&UserPassword=aark123&PhoneNumber="+edtPhoneNumber.getText()+"&Text=Your one time password at Science City is : "+otpRandom+"";
+                webViewOtp.loadUrl(url);
+                Utility.showToast(RegistrationActivity.this,"OTP Send Successfully");
+            }
+        });
+
+        txtDateofbirth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get Current Date
+                final Calendar c = Calendar.getInstance();
+                mYear = c.get(Calendar.YEAR);
+                mMonth = c.get(Calendar.MONTH);
+                mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(RegistrationActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+
+                                txtDateofbirth.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
+
+        btnRadioMale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (btnRadioMale.isChecked()){
+                    gender = "male";
+                }else{
+                    gender = "female";
+                }
+            }
+        });
+
+        btnRadioFemale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (btnRadioMale.isChecked()){
+                    gender = "Female";
+                }else{
+                    gender = "male";
+                }
+            }
+        });
+    }
+
+    private void checkEmail() {
+        try {
+            if (Utility.isNetworkAvailable(RegistrationActivity.this)) {
+                Utility.showProgress(RegistrationActivity.this);
+
+                WebServicesRequest.ConsumerApiInterface service = WebServicesRequest.getClient();
+
+                Map jasonData = new HashMap();
+                jasonData.put("email_id",Utility.getSharePreString(RegistrationActivity.this,"EMAIL_ID"));
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(jasonData)).toString());
+
+                Call<CheckEmailRequestResponse> call = service.getCheckEmail(body);
+
+                call.enqueue(new Callback<CheckEmailRequestResponse>() {
+                    @Override
+                    public void onResponse(Call<CheckEmailRequestResponse> call, Response<CheckEmailRequestResponse> response) {
+                        if (response.isSuccessful()) {
+                            final CheckEmailRequestResponse result = response.body();
+
+                            if (result.getStatus() == 1) {
+
+                                isEmailVerify = true;
+
+                                otpRandom = String.valueOf(Math.random()).substring(3,8);
+                                lnrOtp.setVisibility(View.VISIBLE);
+                                lnrSignUp.setVisibility(View.GONE);
+                                webViewOtp.clearCache(true);
+                                isFromOtp = true;
+                                String url = "http://ip.shreesms.net/smsserver/SMS10N.aspx?Userid=SCCITY&UserPassword=SCCITY&PhoneNumber"+edtPhoneNumber.getText()+"&Text=Your one time password at Science City is : "+otpRandom+"";
+                                webViewOtp.loadUrl(url);
+                                Utility.hideProgress();
+
+                            } else {
+                                Utility.showToast(RegistrationActivity.this, result.getMessage());
+                                Utility.hideProgress();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckEmailRequestResponse> call, Throwable t) {
+                        t.printStackTrace();
+                        Utility.hideProgress();
+                        Utility.showToast(RegistrationActivity.this, "Server Error");
+                    }
+                });
+
+            } else {
+                Utility.hideProgress();
+                Utility.showToast(this, getString(R.string.check_internet));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void userRegistration() {
+        try {
+            if (Utility.isNetworkAvailable(RegistrationActivity.this)) {
+                Utility.showProgress(RegistrationActivity.this);
+
+                WebServicesRequest.ConsumerApiInterface service = WebServicesRequest.getClient();
+                Map jasonData = new HashMap();
+                jasonData.put("fname",edtFirstName.getText().toString().trim());
+                jasonData.put("lname",edtLastName.getText().toString().trim());
+                jasonData.put("gender",gender);
+                jasonData.put("mobile",edtPhoneNumber.getText().toString().trim());
+                jasonData.put("otp",otpRandom);
+                jasonData.put("email_id",edtEmailAddress.getText().toString().trim());
+                jasonData.put("password",edtPassword.getText().toString().trim());
+                jasonData.put("confirm_password",edtConfirmPassword.getText().toString().trim());
+
+                Log.i("Registration ","Request  :"+jasonData.toString());
+
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(jasonData)).toString());
+
+                Call<RegistrationRequestResponse> call = service.getUserRegistration(body);
+
+                call.enqueue(new Callback<RegistrationRequestResponse>() {
+                    @Override
+                    public void onResponse(Call<RegistrationRequestResponse> call, Response<RegistrationRequestResponse> response) {
+                        if (response.isSuccessful()) {
+                            final RegistrationRequestResponse result = response.body();
+
+                            if (result.getStatus() == 1) {
+                                Utility.hideProgress();
+
+                                Log.i("Registration ","Response Email :"+result.getEmail_id());
+
+                                Utility.setSharePreString(RegistrationActivity.this,"LOGIN","LOGIN");
+                                Utility.setSharePreString(RegistrationActivity.this,"LOGIN_ID",result.getUser_id());
+                                Utility.setSharePreString(RegistrationActivity.this,"EMAIL_ID",result.getEmail_id());
+                                Utility.setSharePreString(RegistrationActivity.this,"LOGIN_PASS",edtConfirmPassword.toString());
+                                Utility.setSharePreString(RegistrationActivity.this,"FNAME",result.getFirstname());
+                                Utility.setSharePreString(RegistrationActivity.this,"SNAME",result.getLastname());
+                                Utility.setSharePreString(RegistrationActivity.this,"MOBILE",result.getMobile());
+                                Utility.setSharePreString(RegistrationActivity.this,"GENDER",result.getGender());
+
+                                startActivity(new Intent(RegistrationActivity.this,HomeActivity.class));
+                                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                                finish();
+
+                                Utility.showToast(RegistrationActivity.this, result.getMessage());
+
+                            } else {
+                                Utility.showToast(RegistrationActivity.this, result.getMessage());
+                                Utility.hideProgress();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RegistrationRequestResponse> call, Throwable t) {
+                        t.printStackTrace();
+                        Utility.hideProgress();
+                        Utility.showToast(RegistrationActivity.this, "Server Error");
+                    }
+                });
+
+            } else {
+                Utility.hideProgress();
+                Utility.showToast(this, getString(R.string.check_internet));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void initialization() {
+        txtActivityTitle.setText("SignUp");
+        showTopBar();
+    }
+
+    @Override
+    public void setupData() {
+
+    }
+
+    @Override
+    public void setListeners() {
+        imgTopFirst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imgTopFirst.setSelected(!imgTopFirst.isSelected());
+                if (imgTopFirst.isSelected()){
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }else{
+                    drawerLayout.closeDrawers();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isFromOtp){
+            lnrOtp.setVisibility(View.GONE);
+            lnrSignUp.setVisibility(View.VISIBLE);
+        }else{
+            startActivity(new Intent(RegistrationActivity.this,HomeActivity.class));
+            overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+            finish();
+        }
+
+    }
+}
