@@ -1,0 +1,132 @@
+public class SettingActivity extends BaseActivity {
+
+    private View mView;
+    private TextView mTxtEditProfile;
+    private TextView mTxtLogout;
+    private TextView mTxtChange_Password;
+    private TextView mTxtForgetPassword;
+
+    @Override
+    public void setLayoutView() {
+        mView = LayoutInflater.from(this).inflate(R.layout.activity_setting, lnrContainer);
+
+        mTxtEditProfile = (TextView) mView.findViewById(R.id.txtEditProfile);
+        mTxtLogout = (TextView) mView.findViewById(R.id.txtLogout);
+        mTxtChange_Password = (TextView) mView.findViewById(R.id.txtChange_Password);
+        mTxtForgetPassword = (TextView) mView.findViewById(R.id.txtForgetPassword);
+
+    }
+
+    @Override
+    public void initialization() {
+        txtActivityTitle.setText("Settings");
+    }
+
+    @Override
+    public void setupData() {
+
+    }
+
+    @Override
+    public void setListeners() {
+        imgTopFirst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imgTopFirst.setSelected(!imgTopFirst.isSelected());
+                if (imgTopFirst.isSelected()){
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }else{
+                    drawerLayout.closeDrawers();
+                }
+            }
+        });
+
+        mTxtEditProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SettingActivity.this,EditProfileActivity.class));
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                finish();
+            }
+        });
+
+        mTxtLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openLogOutDialog().show();
+            }
+        });
+
+        mTxtChange_Password.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SettingActivity.this,ForgortPasswordActivity.class);
+                intent.putExtra("SETTING",false);
+                intent.putExtra("FROM_LOGIN",false);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        mTxtForgetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SettingActivity.this,ForgortPasswordActivity.class);
+                intent.putExtra("SETTING",true);
+                intent.putExtra("FROM_LOGIN",false);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+    }
+
+    public Dialog openLogOutDialog() {
+        final Dialog userLogOutDialog = new Dialog(SettingActivity.this, R.style.AppTheme);
+        try {
+            userLogOutDialog.setContentView(R.layout.dialog_log_out);
+            userLogOutDialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.transparent2)));
+            final Button btnYes = (Button) userLogOutDialog.findViewById(R.id.btnYes);
+            final Button btnNo = (Button) userLogOutDialog.findViewById(R.id.btnNo);
+
+            btnNo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    userLogOutDialog.dismiss();
+                }
+            });
+
+            btnYes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        userLogOutDialog.dismiss();
+                        Utility.removeSharePre(SettingActivity.this);
+                        Intent intent = new Intent(SettingActivity.this, LoginActivity.class);
+                        intent.putExtra("FROM","BASE");
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                        finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            return userLogOutDialog;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userLogOutDialog;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(SettingActivity.this,HomeActivity.class));
+        overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+        finish();
+    }
+}
