@@ -1,0 +1,91 @@
+public class WebServicesRequest {
+
+    private static ConsumerApiInterface consumerApiInterface;
+
+    public static ConsumerApiInterface getClient() {
+        if (consumerApiInterface == null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient okClient = new OkHttpClient.Builder().addInterceptor(logging).build();
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+
+            Retrofit client = new Retrofit.Builder().baseUrl(Utility.BASE_URL).client(okClient).addConverterFactory(GsonConverterFactory.create(gson)).build();
+            consumerApiInterface = client.create(ConsumerApiInterface.class);
+        }
+        return consumerApiInterface;
+    }
+
+    public interface ConsumerApiInterface {
+
+        @GET("web_videogallery.php")
+        Call<VideoListRequestResponse> getVideoList();
+
+        @GET("web_photogallery.php")
+        Call<PhotoGalleryRequestResponse> getImagesList();
+
+        @GET("web_seminar.php")
+        Call<EventsRequestResponse> getEventsList();
+
+        @Headers("Content-Type: application/json")
+        @POST("web_orderhistory.php")
+        Call<YourTicketRequestResponse> getTicketList(@Body RequestBody params);
+
+        @GET("web_movielist.php")
+        Call<MoviesRequestResponse> getMoviesList();
+
+        @GET("web_attractionrates.php")
+        Call<AttractionRatesRequestResponse> getAttractionRate();
+
+        @GET("web_entryparking.php")
+        Call<EnteryRateRequestResponse> getEnteryTickeRate();
+
+        @Headers("Content-Type: application/json")
+        @POST("web_login_response.php")
+        Call<LoginRequestResponse> getUserLogin(@Body RequestBody params);
+
+        @Headers("Content-Type: application/json")
+        @POST("web_movierate.php")
+        Call<MovieRateRequestResponse> getMovieRates(@Body RequestBody params);
+
+        @Headers("Content-Type: application/json")
+        @POST("web_forgotpassword_response.php")
+        Call<ForgotPasswordRequestResponse> getForgotPassword(@Body RequestBody params);
+
+        @Headers("Content-Type: application/json")
+        @POST("web_changepassword_response.php")
+        Call<ForgotPasswordRequestResponse> getChangePassword(@Body RequestBody params);
+        // @Field("user_id")String user_id,@Field("old_password")String old_password,@Field("password")String password,@Field("confirm_password")String confirm_password
+
+        @Headers("Content-Type: application/json")
+        @POST("web_editprofile_response.php")
+        Call<UpdateProfileRequestResponse> getUpdateProfile(@Body RequestBody params);
+        // @Field("user_id")String user_id, @Field("fname")String fname,@Field("lname")String lname,@Field("birthdate")String birthdate,@Field("mobile")String mobile,@Field("gender")String gender
+
+        @Headers("Content-Type: application/json")
+        @POST("web_registration_response.php")
+        Call<RegistrationRequestResponse> getUserRegistration(@Body RequestBody params);
+        // @Field("fname")String fname,@Field("lname")String lname,@Field("gender")String gender,@Field("birthdate")String birthdate,@Field("mobile")String mobile,@Field("otp")String otp,@Field("email_id")String email_id,@Field("password")String password,@Field("confirm_password")String confirm_password
+
+        @Headers("Content-Type: application/json")
+        @POST("web_checkemail.php")
+        Call<CheckEmailRequestResponse> getCheckEmail(@Body RequestBody params);
+
+        @Headers("Content-Type: application/json")
+        @POST("web_entryparking_response.php")
+        Call<EntryParkingBookingRequestResponse> getEntryParkingBooking(@Body RequestBody params);
+
+        @Headers("Content-Type: application/json")
+        @POST("web_attractionticket_response.php")
+        Call<EntryParkingBookingRequestResponse> getAttractionBooking(@Body RequestBody params);
+
+        @Headers("Content-Type: application/json")
+        @POST("web_movieticket_response.php")
+        Call<EntryParkingBookingRequestResponse> getMovieBooking(@Body RequestBody params);
+
+/*        @Headers("Content-Type: application/json")
+        @POST("web_entryparking_response.php")
+        Call<EntryParkingBookingRequestResponse> getEntryParkingBooking(@Body RequestBody params);*/
+
+    }
+}
