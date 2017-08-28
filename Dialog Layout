@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@android:color/transparent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/lnrLogOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button2"
+        android:layout_margin="@dimen/_15sdp"
+        android:orientation="vertical">
+
+        <com.sciencecity.ahm.CustomView.CustomTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:padding="@dimen/_5sdp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:text="Are you sure \n you want to log out?"/>
+
+        <View
+            android:id="@+id/lineView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginRight="@dimen/_15sdp"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_15sdp"
+            android:background="@color/white_dark">
+
+            <com.sciencecity.ahm.CustomView.CustomButton
+                android:id="@+id/btnYes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="@dimen/_5sdp"
+                android:paddingBottom="@dimen/_5sdp"
+                android:textAllCaps="true"
+                android:layout_marginRight="@dimen/tiny_margin"
+                android:paddingLeft="@dimen/_10sdp"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:paddingRight="@dimen/_5sdp"
+                android:background="@color/appColor"
+                android:text="Yes" />
+
+            <com.sciencecity.ahm.CustomView.CustomButton
+                android:id="@+id/btnNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="@dimen/_5sdp"
+                android:paddingBottom="@dimen/_5sdp"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="bold"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:background="@color/appColor"
+                android:textColor="@android:color/white"
+                android:textAllCaps="true"
+                android:paddingLeft="@dimen/_10sdp"
+                android:paddingRight="@dimen/_10sdp"
+                android:text="No"
+                android:layout_toRightOf="@+id/txtYes" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
