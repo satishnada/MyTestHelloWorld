@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<string name="URL">http://192.168.100.140/sogi/Source/php/api/api?</string>-->
+    <string name="URL">http://192.168.1.105/kpapi/api/Services/ChangePassword</string>
+    <string name="GCM_ID">487992448083</string>
+    <!--<string name="terms_conditions_url">http://192.168.100.140/sogi/Source/php/terms-conditions</string>-->
+    <string name="terms_conditions_url">http://clientveb.net/clients/2016/sogi/terms-conditions</string>
+
+    <!--<string name="map_key">AIzaSyARwCJqyxRXmjxv05QeRRwkd415A1oKJXw</string>-->
+
+    <!--My Map Key-->
+    <string name="map_key">AIzaSyB1gZPtMQTEX-ziINUdMqViSoNnouvjni4</string>
+    <!--<string name="map_key">AIzaSyBuL-dPhwn6gCmEVSHq5ljgXrCnEDo7gL0</string>-->
+</resources>
