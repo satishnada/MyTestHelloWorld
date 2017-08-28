@@ -1,0 +1,197 @@
+public class LoginActivity extends BaseActivity {
+
+    private final String TAG = LoginActivity.class.getSimpleName();
+
+    private View mView;
+    private ImageView mImgLogo;
+    private EditText mEdtUserName;
+    private EditText mEdtPassword;
+    private TextView mTxtSignUp;
+    private TextView txtForgetPassword;
+    private Button mBtnSignIn;
+    private LinearLayout mLnrLogin;
+
+    private String from = "";
+
+    @Override
+    public void setLayoutView() {
+        mView = LayoutInflater.from(this).inflate(R.layout.activity_login, lnrContainer);
+        mImgLogo = (ImageView) findViewById(R.id.imgLogo);
+        mEdtUserName = (EditText) findViewById(R.id.edtUserName);
+        mEdtPassword = (EditText) findViewById(R.id.edtUserPassword);
+        mBtnSignIn = (Button) findViewById(R.id.btnSignIn);
+        mTxtSignUp = (TextView) findViewById(R.id.txtSignUp);
+        mLnrLogin = (LinearLayout) findViewById(R.id.lnrLogin);
+        txtForgetPassword = (TextView) findViewById(R.id.txtForgetPassword);
+
+        try {
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null){
+                from = getIntent().getExtras().getString("FROM");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        mBtnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mEdtUserName.getText().toString().trim().length() == 0) {
+                    Toast.makeText(LoginActivity.this, "Please enter email id", Toast.LENGTH_SHORT).show();
+                } else if (mEdtPassword.getText().toString().trim().length() == 0) {
+                    Toast.makeText(LoginActivity.this, getResources().getText(R.string.valid_password), Toast.LENGTH_SHORT).show();
+                } else {
+                    userLogin();
+                }
+            }
+        });
+
+        mTxtSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this,RegistrationActivity.class));
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                finish();
+            }
+        });
+
+        txtForgetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this,ForgortPasswordActivity.class);
+                intent.putExtra("SETTING",true);
+                intent.putExtra("FROM_LOGIN",true);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+    }
+
+    @Override
+    public void initialization() {
+        txtActivityTitle.setText("Sign In");
+    }
+
+    @Override
+    public void setupData() {
+
+    }
+
+    @Override
+    public void setListeners() {
+        imgTopFirst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imgTopFirst.setSelected(!imgTopFirst.isSelected());
+                if (imgTopFirst.isSelected()){
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }else{
+                    drawerLayout.closeDrawers();
+                }
+            }
+        });
+    }
+
+    private void userLogin() {
+        try {
+            if (Utility.isNetworkAvailable(LoginActivity.this)) {
+                Utility.showProgress(LoginActivity.this);
+
+                WebServicesRequest.ConsumerApiInterface service = WebServicesRequest.getClient();
+
+                Map jasonData = new HashMap();
+                jasonData.put("email_id",mEdtUserName.getText().toString().trim());
+                jasonData.put("password",mEdtPassword.getText().toString().trim());
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(jasonData)).toString());
+
+                Call<LoginRequestResponse> call = service.getUserLogin(body);
+
+                call.enqueue(new Callback<LoginRequestResponse>() {
+                    @Override
+                    public void onResponse(Call<LoginRequestResponse> call, Response<LoginRequestResponse> response) {
+                        if (response.isSuccessful()) {
+                            final LoginRequestResponse result = response.body();
+
+                            if (result.getStatus() == 1) {
+                                Utility.hideProgress();
+
+                                mEdtPassword.setText("");
+                                mEdtUserName.setText("");
+
+                                Utility.setSharePreString(LoginActivity.this,"LOGIN","LOGIN");
+                                Utility.setSharePreString(LoginActivity.this,"LOGIN_ID",result.getUser_id());
+                                Utility.setSharePreString(LoginActivity.this,"EMAIL_ID",result.getEmail_id());
+                                Utility.setSharePreString(LoginActivity.this,"LOGIN_PASS",mEdtPassword.toString());
+                                Utility.setSharePreString(LoginActivity.this,"FNAME",result.getFirstname());
+                                Utility.setSharePreString(LoginActivity.this,"SNAME",result.getLastname());
+                                Utility.setSharePreString(LoginActivity.this,"MOBILE",result.getMobile());
+                                Utility.setSharePreString(LoginActivity.this,"GENDER",result.getGender());
+
+                              //  startActivity(new Intent(LoginActivity.this,MovieBookingDetailActivity.class));
+                              //  overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                                if (from.equalsIgnoreCase("BASE")){
+                                    startActivity(new Intent(LoginActivity.this,HomeActivity.class));
+                                    overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                                    finish();
+                                }else{
+                                    finish();
+                                }
+
+                                Utility.showToast(LoginActivity.this, result.getMessage());
+
+                            } else {
+                                mEdtPassword.setText("");
+                                mEdtUserName.setText("");
+                                Utility.showToast(LoginActivity.this, result.getMessage());
+                                Utility.hideProgress();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<LoginRequestResponse> call, Throwable t) {
+                        t.printStackTrace();
+                        Utility.hideProgress();
+                        Utility.showToast(LoginActivity.this, "Server Error");
+                    }
+                });
+
+            } else {
+                Utility.hideProgress();
+                Utility.showToast(this, getString(R.string.check_internet));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            if (from.equalsIgnoreCase("ENTRY_TICKET_BOOKING")){
+                // Intent entryIntent = new Intent(LoginActivity.this,EnteryAndTicketBookinActivity.class);
+                // startActivity(entryIntent);
+                finish();
+            }else if (from.equalsIgnoreCase("MOVIE_TICKET_BOOKING")){
+                // Intent moviewIntent = new Intent(LoginActivity.this,MovieBookingDetailActivity.class);
+                // startActivity(moviewIntent);
+                finish();
+            }else if (from.equalsIgnoreCase("ATTRACTION_BOOKING")){
+                // Intent entryIntent = new Intent(LoginActivity.this,EnteryAndTicketBookinActivity.class);
+                // startActivity(entryIntent);
+                finish();
+            }else{
+                Intent entryIntent = new Intent(LoginActivity.this,HomeActivity.class);
+                overridePendingTransition(R.anim.activity_transition, R.anim.activity_transition);
+                startActivity(entryIntent);
+                finish();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
+}
