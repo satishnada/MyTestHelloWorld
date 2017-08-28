@@ -1,0 +1,65 @@
+package theofficeoutlet.com.theofficeoutlet.Database;
+
+public class DBUtility {
+
+    public static final String DATABASE_NAME = "OFFICE_OUTLET";
+
+    public static final String TABLE_ORDERS = "ORDERS";
+    public static final String ORDER_ID = "ORDER_ID";
+    public static final String ORDER_NUMBER = "ORDER_NUMBER";
+    public static final String ORDER_DELIVERY_DATE = "ORDER_DELIVERY_DATE";
+    public static final String ORDER_DELIVERY_ADDRESS = "ORDER_DELIVERY_ADDRESS";
+    public static final String ORDER_CONTACT_PERSON = "ORDER_CONTACT_PERSON";
+    public static final String ORDER_PHONE = "ORDER_PHONE";
+    public static final String ORDER_STATUS = "ORDER_STATUS";
+
+    public static final String TABLE_ORDER_ITEMS = "ORDER_ITEMS";
+    public static final String ITEM_ID = "ITEM_ID";
+    public static final String ITEM_NAME = "ITEM_NAME";
+    public static final String ITEM_SKU = "ITEM_SKU";
+    public static final String ITEM_IMAGE = "ITEM_IMAGE";
+    public static final String ITEM_STATUS = "ITEM_STATUS";
+
+    public static final String TABLE_ITEM_OPTIONS = "ITEM_OPTIONS";
+    public static final String OPTION_ID = "OPTION_ID";
+    public static final String OPTION_LABEL = "OPTION_LABEL";
+    public static final String OPTION_VALUE = "OPTION_VALUE";
+
+    public static final String TABLE_DELIVERY = "DELIVERY";
+    public static final String DELIVERY_ITEM_ID = "DELIVERY_ITEM_ID";
+    public static final String DELIVERY_STATUS_CODE = "DELIVERY_STATUS_CODE";
+    public static final String DELIVERY_REASON = "DELIVERY_REASON";
+    public static final String DELIVERY_IMAGE = "DELIVERY_IMAGE";
+    public static final String DELIVERY_SIGN = "DELIVERY_SIGN";
+
+    public static final String CREATE_ORDER_TABLE = "CREATE TABLE IF NOT EXISTS " + DBUtility.TABLE_ORDERS + "("
+            +ORDER_ID                +" TEXT,"
+            +ORDER_NUMBER            +" TEXT,"
+            +ORDER_DELIVERY_DATE     +" TEXT,"
+            +ORDER_DELIVERY_ADDRESS  +" TEXT,"
+            +ORDER_PHONE             +" TEXT,"
+            +ORDER_CONTACT_PERSON    +" TEXT,"
+            +ORDER_STATUS            +" INTEGER)";
+
+    public static final String CREATE_ORDER_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + DBUtility.TABLE_ORDER_ITEMS + "("
+            +ITEM_ID        +" TEXT,"
+            +ORDER_ID       +" TEXT,"
+            +ITEM_NAME      +" TEXT,"
+            +ITEM_SKU       +" TEXT,"
+            +ITEM_IMAGE     +" BLOB,"
+            +ITEM_STATUS    +" TEXT)";
+
+    public static final String CREATE_ITEM_OPTION_TABLE = "CREATE TABLE IF NOT EXISTS " + DBUtility.TABLE_ITEM_OPTIONS + "("
+            +ORDER_ID       +" TEXT,"
+            +ITEM_ID        +" TEXT,"
+            +OPTION_LABEL   +" TEXT,"
+            +OPTION_VALUE   +" TEXT)";
+
+    public static final String CREATE_DELIVERY_TABLE = "CREATE TABLE IF NOT EXISTS " + DBUtility.TABLE_DELIVERY + "("
+            +DELIVERY_ITEM_ID     +" TEXT,"
+            +DELIVERY_STATUS_CODE +" TEXT,"
+            +DELIVERY_REASON      +" TEXT,"
+            +DELIVERY_IMAGE       +" BLOB,"
+            +DELIVERY_SIGN        +" BLOB)";
+
+}
