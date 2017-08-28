@@ -1,0 +1,490 @@
+package theofficeoutlet.com.theofficeoutlet.Database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.sql.Blob;
+import java.util.ArrayList;
+
+import theofficeoutlet.com.theofficeoutlet.Model.Delivery;
+import theofficeoutlet.com.theofficeoutlet.Model.ItemOptions;
+import theofficeoutlet.com.theofficeoutlet.Model.OrderItem;
+import theofficeoutlet.com.theofficeoutlet.RequestResponse.OrderListRequestResponse;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+    public static DBHelper dbHelper;
+    public String TAG = DBHelper.class.getSimpleName();
+
+    public DBHelper(Context context) {
+        super(context, DBUtility.DATABASE_NAME, null, 1);
+    }
+
+    public static DBHelper getInstance(Context context) {
+        if (dbHelper == null) {
+            dbHelper = new DBHelper(context);
+        }
+        return dbHelper;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(DBUtility.CREATE_ORDER_TABLE);
+        db.execSQL(DBUtility.CREATE_ORDER_ITEM_TABLE);
+        db.execSQL(DBUtility.CREATE_ITEM_OPTION_TABLE);
+        db.execSQL(DBUtility.CREATE_DELIVERY_TABLE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+        db.execSQL("DROP TABLE IF EXISTS " + DBUtility.CREATE_ORDER_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + DBUtility.CREATE_ORDER_ITEM_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + DBUtility.CREATE_ITEM_OPTION_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + DBUtility.CREATE_DELIVERY_TABLE);
+        onCreate(db);
+    }
+
+
+    public boolean insertDeliveryCustomer(String deliveryItemId, String deliveryStatusCode,String deliveryReason) {
+        Log.i("OfficeOutLietDB","Insert DELIVERY");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues insertDelivery = new ContentValues();
+        insertDelivery.put(DBUtility.DELIVERY_ITEM_ID, deliveryItemId);
+        insertDelivery.put(DBUtility.DELIVERY_STATUS_CODE, deliveryStatusCode);
+        insertDelivery.put(DBUtility.DELIVERY_REASON, deliveryReason);
+        db.insert(DBUtility.TABLE_DELIVERY, null, insertDelivery);
+        return true;
+    }
+
+    public boolean insertDelivery(String deliveryItemId, String deliveryStatusCode, String deliveryReason,byte[] deliveryImage,byte[] deliverySign) {
+        Log.i("OfficeOutLietDB","Insert DELIVERY");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues insertDelivery = new ContentValues();
+        insertDelivery.put(DBUtility.DELIVERY_ITEM_ID, deliveryItemId);
+        insertDelivery.put(DBUtility.DELIVERY_STATUS_CODE, deliveryStatusCode);
+        insertDelivery.put(DBUtility.DELIVERY_REASON, deliveryReason);
+        insertDelivery.put(DBUtility.DELIVERY_IMAGE, deliveryImage);
+        insertDelivery.put(DBUtility.DELIVERY_SIGN, deliverySign);
+        db.insert(DBUtility.TABLE_DELIVERY, null, insertDelivery);
+        return true;
+    }
+
+
+    public ArrayList<Delivery> getDeliveryList(int start,int limit) {
+        Delivery delivery = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_DELIVERY +" LIMIT "+ limit, null);
+
+        ArrayList<Delivery> deliveryList = new ArrayList<Delivery>();
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                delivery = new Delivery();
+                delivery.setDeliveryItemId(cursor.getString(cursor.getColumnIndex(DBUtility.DELIVERY_ITEM_ID)));
+                delivery.setDeliveryStatusCode(cursor.getString(cursor.getColumnIndex(DBUtility.DELIVERY_STATUS_CODE)));
+                delivery.setDeliveryReason(cursor.getString(cursor.getColumnIndex(DBUtility.DELIVERY_REASON)));
+                delivery.setDeliveryImage(cursor.getBlob(cursor.getColumnIndex(DBUtility.DELIVERY_IMAGE)));
+                delivery.setDeliverySign(cursor.getBlob(cursor.getColumnIndex(DBUtility.DELIVERY_SIGN)));
+                deliveryList.add(delivery);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return deliveryList;
+    }
+
+    /*public byte[] retreiveImageFromDB() {
+        Cursor cur = mDb.query(true, IMAGES_TABLE, new String[]{IMAGE,},
+                null, null, null, null,
+                IMAGE_ID + " DESC", "1");
+        if (cur.moveToFirst()) {
+            byte[] blob = cur.getBlob(cur.getColumnIndex(IMAGE));
+            cur.close();
+            return blob;
+        }
+        cur.close();
+        return null;
+    }*/
+
+    public boolean insertOrder(String orderId, String orderNumber, String orderDeliveryDate,String orderDeliveryAddress,String orderContactPerson,String orderPhone,int orderStatus) {
+        Log.i("OfficeOutLietDB","Insert Orders");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues insertUser = new ContentValues();
+        insertUser.put(DBUtility.ORDER_ID, orderId);
+        insertUser.put(DBUtility.ORDER_NUMBER, orderNumber);
+        insertUser.put(DBUtility.ORDER_DELIVERY_DATE, orderDeliveryDate);
+        insertUser.put(DBUtility.ORDER_DELIVERY_ADDRESS,orderDeliveryAddress);
+        insertUser.put(DBUtility.ORDER_PHONE,orderPhone);
+        insertUser.put(DBUtility.ORDER_CONTACT_PERSON,orderContactPerson);
+        insertUser.put(DBUtility.ORDER_STATUS,orderStatus);
+        db.insert(DBUtility.TABLE_ORDERS, null, insertUser);
+        return true;
+    }
+
+  /*  public boolean isOrderConfirm(String orderId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ORDERS +" WHERE ORDER_ID = '"+orderId+"'" , null);
+        return cursor.getCount();
+    }*/
+
+    public boolean isOrderExist(String orderId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ORDERS +" WHERE ORDER_ID = '"+orderId+"'" , null);
+        if(cursor.getCount() == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean insertOrderItems(String orderId, String itemId, String itemName,String itemSku,byte[] itemImage,String itemStatus) {
+        Log.i("OfficeOutLietDB","Insert Order Items");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues orderItems = new ContentValues();
+        orderItems.put(DBUtility.ORDER_ID, orderId);
+        orderItems.put(DBUtility.ITEM_ID, itemId);
+        orderItems.put(DBUtility.ITEM_NAME, itemName);
+        orderItems.put(DBUtility.ITEM_SKU,itemSku);
+        orderItems.put(DBUtility.ITEM_IMAGE,itemImage);
+        orderItems.put(DBUtility.ITEM_STATUS,itemStatus);
+        db.insert(DBUtility.TABLE_ORDER_ITEMS, null, orderItems);
+        return true;
+    }
+
+    public boolean isOrderItemOptionExist(String orderId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ITEM_OPTIONS +" WHERE ORDER_ID = '"+orderId+"'" , null);
+        if(cursor.getCount() == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+  /*  // Insert the image to the Sqlite DB
+    public void insertImage(byte[] imageBytes) {
+        ContentValues cv = new ContentValues();
+        cv.put("PHOTO_IMAGE", imageBytes);
+        mDb.insert(IMAGES_TABLE, null, cv);
+    }*/
+
+
+    public boolean insertItemOptions(String orderId, String itemId,String optionLabel,String optionValue) {
+        Log.i("OfficeOutLietDB","Insert Order Items Options");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues itemsOptions = new ContentValues();
+        itemsOptions.put(DBUtility.ORDER_ID, orderId);
+        itemsOptions.put(DBUtility.ITEM_ID, itemId);
+        itemsOptions.put(DBUtility.OPTION_LABEL,optionLabel);
+        itemsOptions.put(DBUtility.OPTION_VALUE,optionValue);
+        db.insert(DBUtility.TABLE_ITEM_OPTIONS, null, itemsOptions);
+        return true;
+    }
+
+    public ArrayList<OrderListRequestResponse.Order> getOrderList() {
+        OrderListRequestResponse.Order order = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ORDERS , null);
+
+        ArrayList<OrderListRequestResponse.Order> orders = new ArrayList<OrderListRequestResponse.Order>();
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                order = new OrderListRequestResponse().new Order();
+
+                order.setOrderid(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_ID)));
+                order.setOrderNumber(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_NUMBER)));
+                order.setDeliveryDate(Integer.parseInt(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_DELIVERY_DATE))));
+                order.setDeliveryAddress(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_DELIVERY_ADDRESS)));
+                order.setPhone(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_PHONE)));
+                order.setContactPerson(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_CONTACT_PERSON)));
+                order.setOrderStatus(cursor.getInt(cursor.getColumnIndex(DBUtility.ORDER_STATUS)));
+
+                orders.add(order);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return orders;
+    }
+
+    public boolean isOrderItemExist(String orderItemId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ORDER_ITEMS +" WHERE ITEM_ID = '"+orderItemId+"'" , null);
+        if(cursor.getCount() == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public OrderListRequestResponse.Order getItemOrder(String itemId){
+        OrderListRequestResponse.Order order = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ORDER_ITEMS +" WHERE ITEM_ID = '"+itemId+"'", null);
+        order = new OrderListRequestResponse().new Order();
+
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                order.setOrderid(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_ID)));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return order;
+    }
+
+    public ArrayList<OrderListRequestResponse.Order.Item> getOrderItemsList(String orderId) {
+        OrderListRequestResponse.Order.Item orderItem = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ORDER_ITEMS +" WHERE ORDER_ID = '"+orderId+"'", null);
+
+        ArrayList<OrderListRequestResponse.Order.Item> orders = new ArrayList<OrderListRequestResponse.Order.Item>();
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                orderItem = new OrderListRequestResponse().new Order().new Item();
+
+                orderItem.setOrderId(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_ID)));
+                orderItem.setItem_id(cursor.getString(cursor.getColumnIndex(DBUtility.ITEM_ID)));
+                orderItem.setName(cursor.getString(cursor.getColumnIndex(DBUtility.ITEM_NAME)));
+                orderItem.setSku(cursor.getString(cursor.getColumnIndex(DBUtility.ITEM_SKU)));
+                orderItem.setImageBytes(cursor.getBlob(cursor.getColumnIndex(DBUtility.ITEM_IMAGE)));
+                orderItem.setStatus(cursor.getString(cursor.getColumnIndex(DBUtility.ITEM_STATUS)));
+
+                orders.add(orderItem);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return orders;
+    }
+
+    public ArrayList<ItemOptions> getItemsOptionsList(String itemId) {
+        ItemOptions itemOptions = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_ITEM_OPTIONS +" WHERE ITEM_ID = '"+itemId+"'", null);
+
+        ArrayList<ItemOptions> options = new ArrayList<ItemOptions>();
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                itemOptions = new ItemOptions();
+
+                itemOptions.setOrderId(cursor.getString(cursor.getColumnIndex(DBUtility.ORDER_ID)));
+                itemOptions.setOrderItemId(cursor.getString(cursor.getColumnIndex(DBUtility.ITEM_ID)));
+                itemOptions.setOptionLabel(cursor.getString(cursor.getColumnIndex(DBUtility.OPTION_LABEL)));
+                itemOptions.setOptionValue(cursor.getString(cursor.getColumnIndex(DBUtility.OPTION_VALUE)));
+
+                options.add(itemOptions);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return options;
+    }
+
+    public boolean updateOrderStatus(String orderId,String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updateOrder = new ContentValues();
+        updateOrder.put(DBUtility.ORDER_STATUS,status);
+        db.update(DBUtility.TABLE_ORDERS, updateOrder, DBUtility.ORDER_ID + " = " + orderId, null);
+        Log.i(TAG, "Update Order status...");
+        return true;
+    }
+
+    public boolean updateOrder(String orderId, String orderNumber, String orderDeliveryDate,String orderDeliveryAddress,String orderContactPerson,String orderPhone,int orderStatus) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updateOrder = new ContentValues();
+        updateOrder.put(DBUtility.ORDER_ID, orderId);
+        updateOrder.put(DBUtility.ORDER_NUMBER, orderNumber);
+        updateOrder.put(DBUtility.ORDER_DELIVERY_DATE, orderDeliveryDate);
+        updateOrder.put(DBUtility.ORDER_DELIVERY_ADDRESS,orderDeliveryAddress);
+        updateOrder.put(DBUtility.ORDER_PHONE,orderPhone);
+        updateOrder.put(DBUtility.ORDER_CONTACT_PERSON,orderContactPerson);
+        updateOrder.put(DBUtility.ORDER_STATUS,orderStatus);
+
+        db.update(DBUtility.TABLE_ORDERS, updateOrder, DBUtility.ORDER_ID + " = " + orderId, null);
+        Log.i(TAG, "Update Order...");
+        return true;
+    }
+
+    public boolean updateItem(String orderId, String itemId, String itemName, String itemSku, byte[] itemImage, String itemStatus) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updateItem = new ContentValues();
+        updateItem.put(DBUtility.ORDER_ID, orderId);
+        updateItem.put(DBUtility.ITEM_ID, itemId);
+        updateItem.put(DBUtility.ITEM_NAME, itemName);
+        updateItem.put(DBUtility.ITEM_SKU,itemSku);
+        updateItem.put(DBUtility.ITEM_IMAGE,itemImage);
+        updateItem.put(DBUtility.ITEM_STATUS,itemStatus);
+
+        db.update(DBUtility.TABLE_ORDER_ITEMS, updateItem, DBUtility.ITEM_ID + " = " + itemId, null);
+        Log.i(TAG, "Update Item...");
+        return true;
+    }
+
+    public boolean updateItem(String itemId,String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updateItem = new ContentValues();
+        updateItem.put(DBUtility.ITEM_STATUS, status);
+        db.update(DBUtility.TABLE_ORDER_ITEMS, updateItem, DBUtility.ITEM_ID + " = " + itemId, null);
+        Log.i(TAG, "Update Item. status..");
+        return true;
+    }
+
+
+
+    public boolean updateItemImage (String itemId,byte[] imageBytes)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updateItem = new ContentValues();
+        updateItem.put(DBUtility.ITEM_ID, itemId);
+        updateItem.put(DBUtility.ITEM_IMAGE, imageBytes);
+        db.update(DBUtility.TABLE_ORDER_ITEMS, updateItem, DBUtility.ITEM_ID + " = " + itemId, null);
+        Log.i(TAG, "Update Item Image...");
+        return true;
+    }
+    public boolean updateOption(String optionId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updateOption = new ContentValues();
+        updateOption.put(DBUtility.OPTION_LABEL, "");
+
+        db.update(DBUtility.TABLE_ITEM_OPTIONS, updateOption, DBUtility.OPTION_ID + " = " + optionId, null);
+        Log.i(TAG, "Update Option...");
+        return true;
+    }
+
+    public int deleteDeliveryItem(int itemId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DBUtility.TABLE_DELIVERY, DBUtility.DELIVERY_ITEM_ID + "=" + itemId, null);
+    }
+
+    public int deleteOrder(String orderId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DBUtility.TABLE_ORDERS, DBUtility.ORDER_ID + "='" + orderId+"'", null);
+    }
+
+    public int deleteItem(String itemId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DBUtility.TABLE_ORDER_ITEMS, DBUtility.ITEM_ID + "='" + itemId+"'", null);
+    }
+
+    public int deleteOption(String itemId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DBUtility.TABLE_ITEM_OPTIONS, DBUtility.ITEM_ID + "='" + itemId+"'", null);
+    }
+
+  /*  public boolean isUserAlreadyExist(String loginId) {
+        int count = 0;
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor res = db.rawQuery("select * from " + DBUtility.TABLE_LOGIN + " where " + DBUtility.USER_ID + " = ?", new String[]{loginId});
+            if (res.getCount() <= 0) {
+                res.close();
+                return false;
+            } else {
+                res.close();
+                return true;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean insertUser(String userId, String userName, String usePassword,String userCustomerId,String userCompanyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues insertUser = new ContentValues();
+        insertUser.put(DBUtility.USER_ID, userId);
+        insertUser.put(DBUtility.USER_NAME, userName);
+        insertUser.put(DBUtility.USER_PASSWORD, usePassword);
+        insertUser.put(DBUtility.USER_COMPANY_ID,userCompanyId);
+        insertUser.put(DBUtility.USER_CUSTOMER_ID,userCustomerId);
+        db.insert(DBUtility.TABLE_LOGIN, null, insertUser);
+        return true;
+    }
+
+    public boolean insertProduct(String userId,String productId,String productName,String meterNumber,String meterType,String rate,String lastReadDate){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues insertProduct = new ContentValues();
+        insertProduct.put(DBUtility.USER_ID, userId);
+        insertProduct.put(DBUtility.PRODUCT_ID, productId);
+        insertProduct.put(DBUtility.PRODUCT_NAME, productName);
+        insertProduct.put(DBUtility.METER_NO, meterNumber);
+        insertProduct.put(DBUtility.METER_TYPE, meterType);
+        insertProduct.put(DBUtility.METER_RATE, rate);
+        insertProduct.put(DBUtility.LAST_READ_DATE, lastReadDate);
+        db.insert(DBUtility.TABLE_PRODUCT, null, insertProduct);
+        Log.i("Database"," Product Inserted Successfully ");
+        return true;
+    }
+
+    public ArrayList<LoginRequestResponse.Login.Product> getProduct(int userId) {
+        LoginRequestResponse.Login.Product userData = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_PRODUCT +" WHERE "+DBUtility.USER_ID+" = "+userId, null);
+
+        ArrayList<LoginRequestResponse.Login.Product> products = new ArrayList<LoginRequestResponse.Login.Product>();
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                userData = new LoginRequestResponse().new Login().new Product();
+
+                userData.setUserId(cursor.getInt(cursor.getColumnIndex(DBUtility.USER_ID)));
+                userData.setIntProductId(cursor.getInt(cursor.getColumnIndex(DBUtility.PRODUCT_ID)));
+                userData.setStrProductName(cursor.getString(cursor.getColumnIndex(DBUtility.PRODUCT_NAME)));
+                userData.setIntMeterNo(cursor.getInt(cursor.getColumnIndex(DBUtility.METER_NO)));
+                userData.setStrMeterType(cursor.getString(cursor.getColumnIndex(DBUtility.METER_TYPE)));
+                userData.setStrRate(cursor.getString(cursor.getColumnIndex(DBUtility.METER_RATE)));
+                userData.setDtLastReadDae(cursor.getString(cursor.getColumnIndex(DBUtility.LAST_READ_DATE)));
+                products.add(userData);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return products;
+    }
+
+    public LoginRequestResponse.Login getUser() {
+        LoginRequestResponse.Login userData = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + DBUtility.TABLE_LOGIN, null);
+        if (cursor != null && cursor.getCount() != 0) {
+            userData =new LoginRequestResponse().new Login();
+            cursor.moveToFirst();
+            Log.i("User ", "Count User " + cursor.getCount());
+            userData.setIntUserId(cursor.getInt(cursor.getColumnIndex(DBUtility.USER_ID)));
+            userData.setStrUserName(cursor.getString(cursor.getColumnIndex(DBUtility.USER_NAME)));
+            userData.setStrPassword(cursor.getString(cursor.getColumnIndex(DBUtility.USER_PASSWORD)));
+            userData.setIntCompanyId(cursor.getInt(cursor.getColumnIndex(DBUtility.USER_COMPANY_ID)));
+            userData.setIntCustomerId(cursor.getInt(cursor.getColumnIndex(DBUtility.USER_CUSTOMER_ID)));
+        }
+        return userData;
+    }
+
+    public int deleteUser() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DBUtility.TABLE_LOGIN, DBUtility.USER_ID + "=" + getUser().getIntUserId(), null);
+    }
+
+    public int deleteProduct() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DBUtility.TABLE_PRODUCT, DBUtility.USER_ID + "=" + getUser().getIntUserId(), null);
+    }
+
+    public boolean updatePassword(String userId, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues updatePassword = new ContentValues();
+        updatePassword.put(DBUtility.USER_PASSWORD, newPassword);
+        db.update(DBUtility.TABLE_LOGIN, updatePassword, DBUtility.USER_ID + " = " + userId, null);
+        Log.i("User", "Password Update...");
+        return true;
+    }*/
+}
