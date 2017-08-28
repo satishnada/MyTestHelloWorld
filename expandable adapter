@@ -1,0 +1,189 @@
+public class AttractionExpandableListAdapter extends BaseExpandableListAdapter {
+
+    private Context mContext;
+    private ArrayList<AttractionRatesRequestResponse.Attraction> mAttractionList;
+    private int childRate = 0;
+    private int adultRate = 0;
+
+    public AttractionExpandableListAdapter(Context context,ArrayList<AttractionRatesRequestResponse.Attraction> arrayList){
+        mContext = context;
+        mAttractionList = arrayList;
+    }
+
+    @Override
+    public int getGroupCount() {
+        return mAttractionList.size();
+    }
+
+    @Override
+    public int getChildrenCount(int i) {
+        return 1;
+    }
+
+    @Override
+    public Object getGroup(int i) {
+        return mAttractionList.get(i);
+    }
+
+    @Override
+    public Object getChild(int i, int i1) {
+        return 1;
+    }
+
+    @Override
+    public long getGroupId(int i) {
+        return i;
+    }
+
+    @Override
+    public long getChildId(int i, int i1) {
+        return i1;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
+
+        AttractionRatesRequestResponse.Attraction attraction = (AttractionRatesRequestResponse.Attraction) getGroup(i);
+
+        if (view == null) {
+            LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = infalInflater.inflate(R.layout.item_attractive_list, null);
+        }
+
+        final RelativeLayout rlTitle = (RelativeLayout) view.findViewById(R.id.rlTitle);
+        final LinearLayout lnrBottomView = (LinearLayout) view.findViewById(R.id.lnrBottomView);
+        final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkbox);
+        final EditText edtChild = (EditText) view.findViewById(R.id.edtChild);
+        final EditText edtAdult = (EditText) view.findViewById(R.id.edtAdult);
+        final TextView txtChildRate = (TextView) view.findViewById(R.id.txtChildRate);
+        final TextView txtAdultRate = (TextView) view.findViewById(R.id.txtAdultRate);
+        final TextView lblListHeader = (TextView) view.findViewById(R.id.txtAttraction);
+
+        for (int j=0;j<attraction.getTicket_rate().size()-1;j++){
+            if (attraction.getTicket_rate().get(j).getType().equalsIgnoreCase("Children")){
+                childRate = Integer.parseInt(attraction.getTicket_rate().get(j).getType_rate());
+                txtChildRate.setText("Rate Rs. "+attraction.getTicket_rate().get(j).getType_rate());
+            }else if (attraction.getTicket_rate().get(j).getType().equalsIgnoreCase("Adult")){
+                adultRate = Integer.parseInt(attraction.getTicket_rate().get(j).getType_rate());
+                txtAdultRate.setText("Rate Rs. "+attraction.getTicket_rate().get(j).getType_rate());
+            }
+        }
+
+        edtChild.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+                setTotal(edtChild,edtAdult,childRate,adultRate,i);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        edtAdult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                setTotal(edtChild,edtAdult,childRate,adultRate,i);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        rlTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rlTitle.setSelected(!rlTitle.isSelected());
+                if (rlTitle.isSelected()){
+                    rlTitle.setSelected(true);
+                    checkbox.setChecked(true);
+                    lnrBottomView.setVisibility(View.VISIBLE);
+                    //rlTitle.setBackgroundColor(mContext.getResources().getColor(R.color.appColor4));
+                }else{
+                    rlTitle.setSelected(false);
+                    checkbox.setChecked(false);
+                    lnrBottomView.setVisibility(View.GONE);
+                    //rlTitle.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+                }
+            }
+        });
+
+        checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    lnrBottomView.setVisibility(View.VISIBLE);
+                   // rlTitle.setBackgroundColor(mContext.getResources().getColor(R.color.appColor4));
+                }else{
+                    lnrBottomView.setVisibility(View.GONE);
+                    //rlTitle.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+                }
+            }
+        });
+
+        lblListHeader.setText(attraction.getAttraction_name());
+
+        return view;
+    }
+
+    private void setTotal(EditText txtChild,EditText txtAdult,int childRate,int adultRate,int position){
+        int child = 0;
+        int adult = 0;
+        try {
+            if (txtChild.getText().toString().trim().length() !=0){
+                child = Integer.parseInt(txtChild.getText().toString().trim());
+            }
+
+            if (txtAdult.getText().toString().trim().length() != 0){
+                adult = Integer.parseInt(txtAdult.getText().toString().trim());
+            }
+
+            int childTotal = child * childRate;
+            int adultTotal = adult * adultRate;
+
+            String totalPrice = String.valueOf((childTotal + adultTotal));
+
+            //((AttractionActivity)mContext).setTotal(totalPrice,position);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
+        final String childText = (String) getChild(i, i1);
+
+        if (view == null) {
+            LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = infalInflater.inflate(R.layout.item_sub_attractive_list, null);
+        }
+
+        return view;
+    }
+
+    @Override
+    public boolean isChildSelectable(int i, int i1) {
+        return false;
+    }
