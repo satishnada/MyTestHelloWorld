@@ -1,0 +1,85 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawerMainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/lnrMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <include layout="@layout/top_bar" />
+
+        <LinearLayout
+            android:id="@+id/lnrContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/red"
+        android:gravity="center|top"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/flHeaderView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@color/red">
+
+            <com.sciencecity.ahm.CustomView.CustomTextView
+                android:id="@+id/txtDrawerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_16sdp"
+                android:paddingBottom="@dimen/_5sdp"
+                android:paddingTop="@dimen/_3sdp"
+                android:layout_gravity="center"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:text="Science City \nAhmedabad"
+                android:textColor="@color/black" />
+
+            <ImageView
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:contentDescription="@string/app_name"
+                android:scaleType="centerCrop"
+                android:src="@drawable/drawer_icon" />
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:visibility="gone"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@color/tabBarColor"
+            android:id="@+id/view">
+        </View>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="@dimen/_130sdp"
+            android:layout_height="match_parent"
+            android:background="@color/red"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>
