@@ -1,4 +1,6 @@
 public class MyApplication extends Application {
+    // For Fragment 
+    //http://tutorialsbuzz.com/2017/02/android-fragment-transaction-one-activity-one-container-with-multiple-fragment.html
 
     public static final String TAG = MyApplication.class.getSimpleName();
     private static MyApplication mInstance;
