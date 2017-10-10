@@ -1,0 +1,44 @@
+App/gradle file Add 
+
+>>>> apply plugin: 'realm-android'
+
+Project/gradle File Add
+
+>>>> classpath "io.realm:realm-gradle-plugin:3.3.1"
+
+
+In Application File >>>
+
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().name("myrealm.realm").build();
+        Realm.setDefaultConfiguration(config);
+        
+>>>> Set it to menifest file.
+
+Create Model Class for User;
+
+public class User extends RealmObject{
+    @PrimaryKey
+    private String id;
+    @Required
+    private String firstName;
+    private String lastName;
+    // Getter Setter here.   
+}    
+
+In Activity 
+
+ Realm realm = Realm.getDefaultInstance();
+            
+            try{
+            realm.beginTransaction();
+            User user = realm.createObject(User.class, UUID.randomUUID().toString());
+            user.setFirstName("nada");
+            user.setLastName("satish");
+            realm.commitTransaction();
+
+            RealmResults<User> users = realm.where(User.class).equalTo("firstName","nada").findAll();
+            Log.i("REALM_DB","Users Size "+users.size());
+            }finally{
+            realm.close();
+            }
