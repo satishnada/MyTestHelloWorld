@@ -1,7 +1,10 @@
 https://github.com/realm/realm-java
 https://github.com/TorzsaCristian/Instagram-API-Android-Tutorial
 
-
+compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.3.0'
 
 App/gradle file Add 
 
