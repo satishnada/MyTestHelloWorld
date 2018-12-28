@@ -1,0 +1,276 @@
+ implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.1'
+ 
+ 
+ public class PointsOverlayView extends View {
+
+  PointF[] points;
+  private Paint paint;
+
+  public PointsOverlayView(Context context) {
+    super(context);
+    init();
+  }
+
+  public PointsOverlayView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    init();
+  }
+
+  public PointsOverlayView(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    init();
+  }
+
+  private void init() {
+    paint = new Paint();
+    paint.setColor(Color.YELLOW);
+    paint.setStyle(Paint.Style.FILL);
+  }
+
+  public void setPoints(PointF[] points) {
+    this.points = points;
+    invalidate();
+  }
+
+  @Override
+  public void draw(Canvas canvas) {
+    super.draw(canvas);
+    if (points != null) {
+      for (PointF pointF : points) {
+        canvas.drawCircle(pointF.x, pointF.y, 10, paint);
+      }
+    }
+  }
+}
+
+
+
+
+------------------------------------------------------------------------
+
+
+public class ScanQrCodeActivity extends BaseActivity implements OnQRCodeReadListener, ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static final int MY_PERMISSION_REQUEST_CAMERA = 0;
+    private View view;
+    private PointsOverlayView pointsOverlayView;
+    private QRCodeReaderView qrCodeReaderView;
+    private ViewGroup mainLayout;
+    private boolean isQrCodeScaned = false;
+    private String ARN_NO = "http://ipure";
+    private boolean isFromHome = false;
+    private int status = 0;
+
+    @Override
+    public void setLayoutView() {
+        view = LayoutInflater.from(this).inflate(R.layout.activity_scan_qr_code, content_frame);
+
+        mainLayout = (ViewGroup) findViewById(R.id.main_layout);
+        qrCodeReaderView = (QRCodeReaderView) view.findViewById(R.id.qrdecoderview);
+        pointsOverlayView = (PointsOverlayView) view.findViewById(R.id.points_overlay_view);
+        qrCodeReaderView.setAutofocusInterval(2000L);
+        qrCodeReaderView.setOnQRCodeReadListener(this);
+        qrCodeReaderView.setBackCamera();
+        qrCodeReaderView.startCamera();
+        ivTopLeftBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        if (getIntent().getExtras() != null) {
+            status = getIntent().getExtras().getInt("STATUS");
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (qrCodeReaderView != null) {
+            qrCodeReaderView.startCamera();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (qrCodeReaderView != null) {
+            qrCodeReaderView.stopCamera();
+        }
+    }
+
+    @Override
+    public void initialization() {
+        txt_header.setText("Scan QR Code");
+        ivTopLeftBack.setVisibility(View.VISIBLE);
+        iv_logout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(ScanQrCodeActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void onQRCodeRead(String text, PointF[] points) {
+        try {
+            Log.i("QRCODE", "onQRCodeRead: " + text);
+
+            pointsOverlayView.setPoints(points);
+
+            if (status == 0 && !isQrCodeScaned) {
+                isQrCodeScaned = true;
+                MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.success_sound);
+                mediaPlayer.start();
+                Utility.showToast("QR CODE scanned successfully", mActivity);
+                waterDelivery(text);
+            } else if (!isQrCodeScaned){
+                isQrCodeScaned = true;
+                MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.success_sound);
+                mediaPlayer.start();
+                Utility.showToast("QR CODE scanned successfully", mActivity);
+                Intent intent = new Intent(ScanQrCodeActivity.this, RegistrationActivity.class);
+                intent.putExtra("FROM_QR_CODE", true);
+                intent.putExtra("QR_CODE",text);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                overridePendingTransition(0, 0);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void waterDelivery(final String qrCode) {
+        try {
+            if (!Utility.isNetworkAvailable(mActivity)) {
+                Utility.showToast(getString(R.string.no_internet_connection));
+            } else {
+                Utility.showProgress(this);
+                WebServiceCaller.ApiInterface service = WebServiceCaller.getClient();
+                Call<ResponseBody> call = service.deliveryWater(qrCode);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                        if (response.isSuccessful()) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response.body().string());
+                                int status = jsonObject.getInt("status");
+                                if (status == 5){
+                                    JSONObject message = jsonObject.getJSONObject("message");
+                                    String mobile = message.getString("mobile");
+                                    String balance = message.getString("balance");
+                                    Intent intent = new Intent(ScanQrCodeActivity.this, QRSuccessActivity.class);
+                                    intent.putExtra("STATUS", 3);
+                                    intent.putExtra("QR_CODE",qrCode);
+                                    intent.putExtra("AMOUNT",mobile);
+                                    intent.putExtra("MOBILE",balance);
+                                    startActivity(intent);
+                                    finish();
+                                    overridePendingTransition(0, 0);
+                                }else if (status == 2){
+                                    //JSONObject messageResponse = jsonObject.getJSONObject("message");
+                                    //String message = messageResponse.getString("data");
+                                    //Utility.showToast(message);
+                                    Intent intent = new Intent(ScanQrCodeActivity.this, QRSuccessActivity.class);
+                                    intent.putExtra("STATUS", 1);
+                                    intent.putExtra("QR_CODE",qrCode);
+                                    intent.putExtra("AMOUNT","");
+                                    intent.putExtra("MOBILE","");
+                                    startActivity(intent);
+                                    finish();
+                                    overridePendingTransition(0, 0);
+
+                                }else {
+                                   // JSONObject messageResponse = jsonObject.getJSONObject("message");
+                                   // String message = messageResponse.getString("data");
+                                   // Utility.showToast(message);
+                                    Intent intent = new Intent(ScanQrCodeActivity.this, QRSuccessActivity.class);
+                                    intent.putExtra("STATUS", 2);
+                                    intent.putExtra("QR_CODE",qrCode);
+                                    intent.putExtra("AMOUNT","");
+                                    intent.putExtra("MOBILE","");
+                                    startActivity(intent);
+                                    finish();
+                                    overridePendingTransition(0, 0);
+
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Utility.showToast("Something want wrong please try again later.");
+                        }
+                        hideProgress();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        hideProgress();
+                        Utility.showError(t.getMessage());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+}
+
+
+
+==================================================================================
+
+activity_scan_qr_code.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.dlazaro66.qrcodereaderview.QRCodeReaderView
+                android:id="@+id/qrdecoderview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.ipure.activities.PointsOverlayView
+                android:id="@+id/points_overlay_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
+
