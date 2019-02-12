@@ -1,0 +1,240 @@
+   implementation 'android.arch.persistence.room:runtime:1.1.1'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
+    implementation 'android.arch.lifecycle:livedata:1.1.1'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
+    implementation 'android.arch.lifecycle:viewmodel:1.1.1'
+    
+    =============================================
+    @Entity(tableName = "category")
+public class Category {
+
+    @PrimaryKey
+    @NonNull
+    @ColumnInfo(name = "category_id")
+    private int id;
+
+    @ColumnInfo(name = "category_name")
+    private String name;
+
+    @NonNull
+    public int getId() {
+        return id;
+    }
+
+    public void setId(@NonNull int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+======================================================
+@Dao
+public interface CategoryDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertCategory(Category category);
+
+    @Query("DELETE FROM CATEGORY")
+    void deleteAll();
+
+    @Query("SELECT * from CATEGORY")
+    List<Category> getAllCategory();
+
+}
+===============================================
+
+@Dao
+public interface ArticleDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertArticle(Article article);
+
+    @Query("DELETE FROM ARTICLE")
+    void deleteAll();
+
+    @Query("SELECT * from ARTICLE ORDER BY article_id DESC")
+    List<Article> getAllArticles();
+
+    @Query("SELECT * FROM ARTICLE WHERE isBookMark =:isBookMark ORDER BY article_id DESC")
+    List<Article> getBookMarkArticle(boolean isBookMark);
+
+    @Query("SELECT * FROM ARTICLE WHERE article_id IN (SELECT category_article_id FROM ARTICLE_CATEGORY WHERE article_category_id =:categoryId) ORDER BY article_id DESC")
+    List<Article> getArticleByCategory(int categoryId);
+
+    @Query("SELECT * FROM ARTICLE WHERE isLike =:isLikes ORDER BY article_id DESC")
+    List<Article> getLikesArticle(boolean isLikes);
+
+    @Query("SELECT * FROM ARTICLE WHERE article_topic LIKE :searchKey")
+    List<Article> getArticleSearchKey(String searchKey);
+
+    @Query("UPDATE ARTICLE SET isBookMark =:bookMark WHERE article_id = :articleId")
+    void setBookMark(boolean bookMark, int articleId);
+
+    @Query("UPDATE ARTICLE SET noOfLikes=:likeTotal ,isLike =:isLike WHERE article_id = :articleId")
+    void setLikes(int likeTotal, boolean isLike, int articleId);
+}
+
+
+===================================================
+
+@Database(entities = {Article.class,Quote.class,Category.class,Post.class,ArticleCategory.class}, version = 1,exportSchema = false)
+public abstract class ArticleRoomDatabase extends RoomDatabase {
+    public abstract ArticleDao articleDao();
+    public abstract CategoryDao categoryDao();
+    public abstract QuotesDao quotesDao();
+    public abstract PostDao postDao();
+    public abstract ArticleCategoryDao articleCategoryDao();
+
+    private static volatile ArticleRoomDatabase INSTANCE;
+
+    public static ArticleRoomDatabase getDatabase(final Context context) {
+        if (INSTANCE == null) {
+            synchronized (ArticleRoomDatabase.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                            ArticleRoomDatabase.class, "bestify_database")
+                            .allowMainThreadQueries()
+                            .build();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+}
+
+==================================================
+
+public class ArticleViewModel extends AndroidViewModel {
+
+    private ArticleRepository mRepository;
+
+    private List<Article> mAllArticles;
+
+    public ArticleViewModel(Application application){
+        super(application);
+        mRepository = new ArticleRepository(application);
+        mAllArticles = mRepository.getAllArticle();
+    }
+
+  public List<Article> getAllArticles(){
+        return mAllArticles;
+    }
+
+    public void insertArticle(Article article){
+        mRepository.insert(article);
+    }
+}
+
+==========================================================
+
+public class ArticleRepository {
+
+    private ArticleDao mArticleDao;
+    private List<Article> mAllArticle;
+
+    ArticleRepository(Application application){
+        ArticleRoomDatabase articleRoomDatabase = ArticleRoomDatabase.getDatabase(application);
+        mArticleDao = articleRoomDatabase.articleDao();
+        mAllArticle = mArticleDao.getAllArticles();
+    }
+
+    List<Article> getAllArticle() {
+        return mAllArticle;
+    }
+
+    public void insert (Article article) {
+        new insertAsyncTask(mArticleDao).execute(article);
+    }
+
+    private static class insertAsyncTask extends AsyncTask<Article, Void, Void> {
+
+        private ArticleDao mAsyncTaskDao;
+
+        insertAsyncTask(ArticleDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Article... params) {
+            mAsyncTaskDao.insertArticle(params[0]);
+            return null;
+        }
+    }
+
+}
+=============================================
+
+    private void getOfflinePost(){
+        if (restored_Issubscribed){
+            binding.progress.setVisibility(View.GONE);
+            try {
+                ArticleRoomDatabase db = ArticleRoomDatabase.getDatabase(getContext());
+                if (db != null){
+                    List<Post> postsList = db.postDao().getAllPost();
+                    if (postsList != null && !postsList.isEmpty()){
+                        postList.clear();
+                        for (int i=0;i<postsList.size();i++){
+                            PostDataReqeustResponse.Post post = new PostDataReqeustResponse().new Post();
+                            Post postDb = postsList.get(i);
+                            post.setId(postDb.getId());
+                            post.setCreatedAt(postDb.getCreatedDate());
+                            post.setFirstName(postDb.getFirstName());
+                            post.setLastName(postDb.getLastName());
+                            post.setIsLike(postDb.isLike());
+                            post.setTotalLikes(postDb.getTotalLike());
+                            post.setPostData(postDb.getPostData());
+                            post.setProfilePhotoThumb(postDb.getProfileUrl());
+                            post.setShowOptions(postDb.isShowOptions());
+                            postList.add(post);
+                        }
+                        postListAdapter.notifyDataSetChanged();
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }else{
+            Utils.showToast(getString(R.string.no_internet_connection));
+        }
+    }
+    
+    
+    =========================================================
+    
+     private void insertOfflinePost(){
+        if (restored_Issubscribed){
+            ArticleRoomDatabase db = ArticleRoomDatabase.getDatabase(getContext());
+            if (db != null){
+                if (postList != null && !postList.isEmpty()){
+                    for (int i=0;i<postList.size();i++){
+                        PostDataReqeustResponse.Post post = postList.get(i);
+                        Post postDb = new Post();
+                        postDb.setId(post.getId());
+                        postDb.setCreatedDate(post.getCreatedAt());
+                        postDb.setFirstName(post.getFirstName());
+                        postDb.setLastName(post.getLastName());
+                        postDb.setLike(post.getIsLike());
+                        postDb.setPostData(post.getPostData());
+                        postDb.setProfileUrl(post.getProfilePhotoThumb());
+                        postDb.setShowOptions(post.getShowOptions());
+                        postDb.setTotalLike(post.getTotalLikes());
+                        postDb.setDelete(false);
+                        db.postDao().insertPost(postDb);
+                        Log.i(TAG, "insertOfflinePost: "+i);
+                    }
+                    Log.i(TAG, "insertOfflinePost: Size "+db.postDao().getAllPost().size());
+                }
+            }
+        }
+    }
+    
+    
+    ====================================================
